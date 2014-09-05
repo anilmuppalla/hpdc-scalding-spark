@@ -1,0 +1,139 @@
+0	# Scalding
+1	
+2	Scalding is a Scala library that makes it easy to specify Hadoop MapReduce jobs. Scalding is built on top of [Cascading](http://www.cascading.org/), a Java library that abstracts away low-level Hadoop details. Scalding is comparable to [Pig](http://pig.apache.org/), but offers tight integration with Scala, bringing advantages of Scala to your MapReduce jobs.
+3	
+4	![Scalding Logo](https://raw.github.com/twitter/scalding/develop/logo/scalding.png)
+5	
+6	Current version: `0.10.0`
+7	
+8	## Word Count
+9	
+10	Hadoop is a distributed system for counting words. Here is how it's done in Scalding.
+11	
+12	```scala
+13	package com.twitter.scalding.examples
+14	
+15	import com.twitter.scalding._
+16	
+17	class WordCountJob(args : Args) extends Job(args) {
+18	  TextLine( args("input") )
+19	    .flatMap('line -> 'word) { line : String => tokenize(line) }
+20	    .groupBy('word) { _.size }
+21	    .write( Tsv( args("output") ) )
+22	
+23	  // Split a piece of text into individual words.
+24	  def tokenize(text : String) : Array[String] = {
+25	    // Lowercase each word and remove punctuation.
+26	    text.toLowerCase.replaceAll("[^a-zA-Z0-9\\s]", "").split("\\s+")
+27	  }
+28	}
+29	```
+30	
+31	Notice that the `tokenize` function, which is standard Scala, integrates naturally with the rest of the MapReduce job. This is a very powerful feature of Scalding. (Compare it to the use of UDFs in Pig.)
+32	
+33	You can find more example code under [examples/](https://github.com/twitter/scalding/tree/master/scalding-core/src/main/scala/com/twitter/scalding/examples). If you're interested in comparing Scalding to other languages, see our [Rosetta Code page](https://github.com/twitter/scalding/wiki/Rosetta-Code), which has several MapReduce tasks in Scalding and other frameworks (e.g., Pig and Hadoop Streaming).
+34	
+35	## Documentation and Getting Started
+36	
+37	* [**Getting Started**](https://github.com/twitter/scalding/wiki/Getting-Started) page on the [Scalding Wiki](https://github.com/twitter/scalding/wiki)
+38	* [**Runnable tutorials**](https://github.com/twitter/scalding/tree/master/tutorial) in the source.
+39	* The API Reference, including many example Scalding snippets:
+40	  * [Fields-based API Reference](https://github.com/twitter/scalding/wiki/Fields-based-API-Reference)
+41	  * [Type-safe API Reference](https://github.com/twitter/scalding/wiki/Type-safe-api-reference)
+42	* [Scalding Scaladocs](http://twitter.github.com/scalding) provide details beyond the API References
+43	* The Matrix Library provides a way of working with key-attribute-value scalding pipes:
+44	  * The [Introduction to Matrix Library](https://github.com/twitter/scalding/wiki/Introduction-to-Matrix-Library) contains an overview and a "getting started" example
+45	  * The [Matrix API Reference](https://github.com/twitter/scalding/wiki/Matrix-API-Reference) contains the Matrix Library API reference with examples
+46	
+47	Please feel free to use the beautiful [Scalding logo](https://drive.google.com/folderview?id=0B3i3pDi3yVgNbm9pMUdDcHFKVEk&usp=sharing) artwork anywhere.
+48	
+49	## Building
+50	There is a script (called sbt) in the root that loads the correct sbt version to build:
+51	
+52	1. ```./sbt update``` (takes 2 minutes or more)
+53	2. ```./sbt test```
+54	3. ```./sbt assembly``` (needed to make the jar used by the scald.rb script)
+55	
+56	The test suite takes a while to run. When you're in sbt, here's a shortcut to run just one test:
+57	
+58	```> test-only com.twitter.scalding.FileSourceTest```
+59	
+60	Please refer to [FAQ page](https://github.com/twitter/scalding/wiki/Frequently-asked-questions#issues-with-sbt) if you encounter problems when using sbt.
+61	
+62	We use [Travis CI](http://travis-ci.org/) to verify the build:
+63	[![Build Status](https://secure.travis-ci.org/twitter/scalding.png)](http://travis-ci.org/twitter/scalding)
+64	
+65	Scalding modules are available from maven central.
+66	
+67	The current groupid and version for all modules is, respectively, `"com.twitter"` and  `0.8.11`.
+68	
+69	Current published artifacts are
+70	
+71	* `scalding-core_2.9.2`
+72	* `scalding-core_2.10`
+73	* `scalding-args_2.9.2`
+74	* `scalding-args_2.10`
+75	* `scalding-date_2.9.2`
+76	* `scalding-date_2.10`
+77	* `scalding-commons_2.9.2`
+78	* `scalding-commons_2.10`
+79	* `scalding-avro_2.9.2`
+80	* `scalding-avro_2.10`
+81	
+82	
+83	The suffix denotes the scala version.
+84	
+85	## Adopters
+86	
+87	* Ebay
+88	* Etsy
+89	* Sharethrough
+90	* Snowplow Analytics
+91	* Soundcloud
+92	* Twitter
+93	
+94	To see a full list of users or to add yourself, see the [wiki](https://github.com/twitter/scalding/wiki/Powered-By)
+95	
+96	## Contact
+97	
+98	For user questions, we are using the cascading-user mailing list for discussions:
+99	<http://groups.google.com/group/cascading-user>
+100	
+101	For scalding development (internals, extending, release planning):
+102	<https://groups.google.com/forum/#!forum/scalding-dev>
+103	
+104	In the remote possibility that there exist bugs in this code, please report them to:
+105	<https://github.com/twitter/scalding/issues>
+106	
+107	Follow [@Scalding](http://twitter.com/scalding) on Twitter for updates.
+108	
+109	Chat (IRC): [freenode](https://webchat.freenode.net/) channel: #scalding
+110	
+111	## Authors:
+112	* Avi Bryant <http://twitter.com/avibryant>
+113	* Oscar Boykin <http://twitter.com/posco>
+114	* Argyris Zymnis <http://twitter.com/argyris>
+115	
+116	Thanks for assistance and contributions:
+117	
+118	* Sam Ritchie <http://twitter.com/sritchie>
+119	* Aaron Siegel: <http://twitter.com/asiegel>
+120	* Brad Greenlee: <http://twitter.com/bgreenlee>
+121	* Edwin Chen <http://twitter.com/edchedch>
+122	* Arkajit Dey: <http://twitter.com/arkajit>
+123	* Krishnan Raman: <http://twitter.com/dxbydt_jasq>
+124	* Flavian Vasile <http://twitter.com/flavianv>
+125	* Chris Wensel <http://twitter.com/cwensel>
+126	* Ning Liang <http://twitter.com/ningliang>
+127	* Dmitriy Ryaboy <http://twitter.com/squarecog>
+128	* Dong Wang <http://twitter.com/dongwang218>
+129	* Kevin Lin <http://twitter.com/reconditesea>
+130	* Josh Attenberg <http://twitter.com/jattenberg>
+131	* Juliet Hougland <https://twitter.com/j_houg>
+132	
+133	A full list of [contributors](https://github.com/twitter/scalding/graphs/contributors) can be found on GitHub.
+134	
+135	## License
+136	Copyright 2013 Twitter, Inc.
+137	
+138	Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
